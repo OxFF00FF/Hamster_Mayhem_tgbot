@@ -10,20 +10,19 @@ from telegram.ext import ContextTypes
 data_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'bot', 'data')
 
 
-#
-# def localized_text(key, bot_language):
-#     with open(f"{data_path}/translations.json", 'r', encoding='utf-8') as f:
-#         translations = json.load(f)
-#
-#     try:
-#         return translations[bot_language][key]
-#     except KeyError:
-#         logging.warning(f"No translation available for bot_language code '{bot_language}' and key '{key}'")
-#         if key in translations['ru']:
-#             return translations['ru'][key]
-#         else:
-#             logging.warning(f"No english definition found for key '{key}' in translations.json")
-#             return key
+def localized_text(key, bot_language):
+    with open(f"{data_path}/translations.json", 'r', encoding='utf-8') as f:
+        translations = json.load(f)
+
+    try:
+        return translations[bot_language][key]
+    except KeyError:
+        logging.warning(f"No translation available for bot_language code '{bot_language}' and key '{key}'")
+        if key in translations['ru']:
+            return translations['ru'][key]
+        else:
+            logging.warning(f"No english definition found for key '{key}' in translations.json")
+            return key
 
 
 def get_games_data():
