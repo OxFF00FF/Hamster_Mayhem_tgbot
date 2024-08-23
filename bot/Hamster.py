@@ -108,7 +108,7 @@ class HamsterKombatClicker:
                     name_from_hamster = str(upgrade['name'].strip().lower())
 
                     match = fuzz.ratio(name_from_site, name_from_hamster)
-                    if match > 85:
+                    if match > 90:
                         combo_ids.append(upgrade['id'])
 
             logging.info(f"Combo: {combo_ids} · Date: {date}")
