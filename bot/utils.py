@@ -7,7 +7,7 @@ import random
 from telegram import Message, MessageEntity, Update
 from telegram.ext import ContextTypes
 
-data_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'Bot', 'data')
+data_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'bot', 'data')
 
 
 #
