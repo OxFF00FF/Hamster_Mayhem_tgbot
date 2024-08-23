@@ -1,0 +1,13 @@
+# docker-compose up -d
+# docker build -t <container_name> .
+# docker run -it <container_name> sh
+
+version: '3'
+services:
+  hamster_mayhem-bot:
+    build: .
+    image: python:3.9-alpine
+    container_name: Hamster_Mayhem_tgbot
+    volumes:
+      - ./bot:/app/bot
+    restart: unless-stopped
