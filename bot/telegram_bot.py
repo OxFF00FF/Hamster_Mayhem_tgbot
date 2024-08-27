@@ -177,12 +177,14 @@ class HamsterPromocodeGeneratorTelegramBot:
 
     async def start_generate(self, update, context):
         bot_message = update.callback_query.message.message_id
+        first_name = update.callback_query.from_user.first_name
         user_id = update.callback_query.from_user.id
         prefix = context.user_data['prefix']
         keys_count = context.user_data['keys_count']
         keyboard = kb.close_InlineKeyboard
 
-        await context.bot.send_message(chat_id=self.config['chat_id'], text=f"📩  Generate: `{prefix} · {keys_count}`\n🙍‍♂️  For user: {user_id}")
+        text = f"📩  Generate: {keys_count} keys for {prefix}\n🙍‍♂️  User: {first_name}\n🆔  {user_id}"
+        await context.bot.send_message(chat_id=self.config['chat_id'], text=text)
 
         try:
             for promo in self.games_data:
