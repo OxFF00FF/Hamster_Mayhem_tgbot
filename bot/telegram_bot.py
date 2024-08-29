@@ -147,7 +147,7 @@ class HamsterPromocodeGeneratorTelegramBot:
                     text = f"💠  Прогресс: {overall_progress:.0f}%"
 
                     await context.bot.edit_message_text(chat_id=user_id, message_id=loading_message.message_id, text=text)
-                    logging.info(f"{prefix} · {overall_progress:.0f}% · User: {user_id}")
+                    logging.info(f"{keys_count} {prefix} · {overall_progress:.0f}% · User: {user_id}")
 
                 if has_code:
                     break
@@ -203,9 +203,10 @@ class HamsterPromocodeGeneratorTelegramBot:
             result = f"<b>{EMOJI} {TITLE}\n\nПромокоды: </b>\n"
             for promocode in promocodes:
                 result += f"·  <code>{promocode}</code>\n"
-
             image = InputMediaPhoto(media=_game_image(prefix), caption=result, parse_mode=constants.ParseMode.HTML)
             await context.bot.edit_message_media(chat_id=user_id, reply_markup=keyboard, media=image, message_id=bot_message)
+
+            logging.info(f"{keys_count} {prefix} promocodes. Send to: {first_name} · {user_id}")
 
         except Exception as e:
             logging.error(e)
