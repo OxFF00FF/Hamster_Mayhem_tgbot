@@ -5,6 +5,9 @@ from utils import get_games_data
 close_button = InlineKeyboardButton("❌  Закрыть", callback_data='close')
 close_InlineKeyboard = InlineKeyboardMarkup([[close_button]])
 
+# кнопка назад к играм
+back_button = InlineKeyboardButton("↩️  Назад", callback_data=f'back_to_games')
+
 
 def fold_button(url: str) -> InlineKeyboardButton:
     return InlineKeyboardButton("🔼  Свернуть", callback_data=f'fold>{url}')
@@ -92,6 +95,9 @@ def promocodes_count_InlineKeyboard() -> InlineKeyboardMarkup:
     three_button = InlineKeyboardButton("3️⃣", callback_data=f'generate_count>3')
     four_button = InlineKeyboardButton("4️⃣", callback_data=f'generate_count>4')
 
-    return InlineKeyboardMarkup([[one_button, two_button],
-                                 [three_button, four_button],
-                                 [close_button]])
+    return InlineKeyboardMarkup([[one_button, two_button, three_button, four_button],
+                                 [back_button, close_button]])
+
+
+def promocodes_result_InlineKeyboard() -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup([[back_button, close_button]])

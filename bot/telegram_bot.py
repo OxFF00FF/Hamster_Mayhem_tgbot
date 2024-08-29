@@ -181,7 +181,7 @@ class HamsterPromocodeGeneratorTelegramBot:
         user_id = update.callback_query.from_user.id
         prefix = context.user_data['prefix']
         keys_count = context.user_data['keys_count']
-        keyboard = kb.close_InlineKeyboard
+        keyboard = kb.promocodes_result_InlineKeyboard()
 
         text = f"📩  Generate: {keys_count} keys for {prefix}\n🙍‍♂️  User: {first_name}\n🆔  {user_id}"
         await context.bot.send_message(chat_id=self.config['chat_id'], text=text)
@@ -336,6 +336,16 @@ class HamsterPromocodeGeneratorTelegramBot:
             context.user_data['keys_count'] = int(match.group(1))
         await self.start_generate(update, context)
 
+    async def callback_back_to_games(self, update: Update, context):
+        user_id = update.callback_query.from_user.id
+        callback_data = update.callback_query.data
+        logging.info(f"Callbackdata: `{callback_data}` FROM user: {user_id}")
+
+        bot_message = update.callback_query.message.message_id
+        keyboard = kb.promocodes_InlineKeyboard()
+        await context.bot.edit_message_reply_markup(chat_id=user_id, reply_markup=keyboard, message_id=bot_message)
+
+
     # ------------------------- /CallBack handlers ---------------------------------------------- #
     # ########################################################################################### #
 
@@ -374,6 +384,7 @@ class HamsterPromocodeGeneratorTelegramBot:
         application.add_handler(CallbackQueryHandler(self.callback_close, pattern=r'^close'))
         application.add_handler(CallbackQueryHandler(self.callback_choose_promo, pattern=r'^promo>'))
         application.add_handler(CallbackQueryHandler(self.callback_choose_count, pattern=r'^generate_count>'))
+        application.add_handler(CallbackQueryHandler(self.callback_back_to_games, pattern=r'^back_to_games'))
 
         # error handlers
         application.add_error_handler(error_handler)
