@@ -97,15 +97,5 @@
             "text": "Cafe Dash",
             "emoji": "\uD83C\uDF75"
         }
-    ],
-    "minigames": [
-        {
-            "title": "Candles",
-            "emoji": "\uD83D\uDCCA"
-        },
-        {
-            "title": "Tiles",
-            "emoji": "\uD83D\uDCA0"
-        }
     ]
 }

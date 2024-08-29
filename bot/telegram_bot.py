@@ -203,6 +203,7 @@ class HamsterPromocodeGeneratorTelegramBot:
             result = f"<b>{EMOJI} {TITLE}\n\nПромокоды: </b>\n"
             for promocode in promocodes:
                 result += f"·  <code>{promocode}</code>\n"
+
             image = InputMediaPhoto(media=_game_image(prefix), caption=result, parse_mode=constants.ParseMode.HTML)
             await context.bot.edit_message_media(chat_id=user_id, reply_markup=keyboard, media=image, message_id=bot_message)
 

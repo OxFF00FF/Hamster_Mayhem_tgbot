@@ -67,8 +67,9 @@ def _game_image(prefix):
     for promo in games_data:
         if promo['prefix'] == prefix:
             try:
-                return open(f'{data_path}/loading_indicators/Hamster/{prefix}.jpg', 'rb')
-            except:
+                return open(f'{data_path}/loading_indicators/Hamster/{prefix.strip()}.jpg', 'rb')
+            except Exception as e:
+                logging.error(e)
                 return open(f'{data_path}/loading_indicators/Hamster/default_game.webp', 'rb')
 
 
