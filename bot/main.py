@@ -26,7 +26,7 @@ def main():
         'token': os.environ['TELEGRAM_BOT_TOKEN'],
         'bot_username': os.environ.get('TELEGRAM_BOT_USERNAME', 'n/a'),
         'bot_language': os.environ.get('BOT_LANGUAGE', 'ru'),
-        'chat_id': os.environ.get('CHAT_ID'),
+        'chat_id': int(os.environ.get('CHAT_ID')),
     }
 
     telegram_bot = HamsterPromocodeGeneratorTelegramBot(config=telegram_config)

@@ -14,7 +14,7 @@ from typing import Any
 
 import aiohttp
 import requests
-from telegram import BotCommand, BotCommandScopeAllGroupChats, Update, constants, InputMediaAnimation, InputMediaPhoto
+from telegram import BotCommand, BotCommandScopeAllGroupChats, Update, constants, InputMediaAnimation, InputMediaPhoto, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import filters, ApplicationBuilder, CommandHandler, MessageHandler, CallbackQueryHandler, Application
 
 import Keyboards as kb
@@ -25,6 +25,7 @@ from db_SQlite import BotDB
 
 db = BotDB()
 
+reactions = {}
 
 # --------------------------------------------------- #
 #  Перезагрузка бота
@@ -345,7 +346,6 @@ class HamsterPromocodeGeneratorTelegramBot:
         keyboard = kb.promocodes_InlineKeyboard()
         await context.bot.edit_message_reply_markup(chat_id=user_id, reply_markup=keyboard, message_id=bot_message)
 
-
     # ------------------------- /CallBack handlers ---------------------------------------------- #
     # ########################################################################################### #
 
@@ -355,6 +355,14 @@ class HamsterPromocodeGeneratorTelegramBot:
         """
         await application.bot.set_my_commands(self.group_commands, scope=BotCommandScopeAllGroupChats())
         await application.bot.set_my_commands(self.commands)
+
+    # ------------------------ TEST ------------------------------------------------ #
+    async def handle_message(self, update: Update, context):
+        print(update)
+        chat_member = await context.bot.get_chat_member(chat_id=update.channel_post.chat_id, user_id=update.channel_post.from_user.id)
+        print(chat_member)
+
+    # ------------------------ TEST ------------------------------------------------ #
 
     def run(self):
         """
@@ -368,23 +376,25 @@ class HamsterPromocodeGeneratorTelegramBot:
             .read_timeout(30) \
             .build()
 
-        # command handlers
-        application.add_handler(CommandHandler('start', self.start))
-        application.add_handler(CommandHandler('help', self.help))
-        application.add_handler(CommandHandler('info', self.info))
-        application.add_handler(CommandHandler('restart', restart))
+        # # command handlers
+        # application.add_handler(CommandHandler('start', self.start))
+        # application.add_handler(CommandHandler('help', self.help))
+        # application.add_handler(CommandHandler('info', self.info))
+        # application.add_handler(CommandHandler('restart', restart))
+        #
+        # application.add_handler(CommandHandler('daily_info', self.daily_info))
+        # application.add_handler(CommandHandler('promocodes', self.promocodes))
+        #
+        # # message handlers
+        # application.add_handler(MessageHandler(filters.TEXT, self.save_message))
+        #
+        # # callback handlers
+        # application.add_handler(CallbackQueryHandler(self.callback_close, pattern=r'^close'))
+        # application.add_handler(CallbackQueryHandler(self.callback_choose_promo, pattern=r'^promo>'))
+        # application.add_handler(CallbackQueryHandler(self.callback_choose_count, pattern=r'^generate_count>'))
+        # application.add_handler(CallbackQueryHandler(self.callback_back_to_games, pattern=r'^back_to_games'))
 
-        application.add_handler(CommandHandler('daily_info', self.daily_info))
-        application.add_handler(CommandHandler('promocodes', self.promocodes))
-
-        # message handlers
-        application.add_handler(MessageHandler(filters.TEXT, self.save_message))
-
-        # callback handlers
-        application.add_handler(CallbackQueryHandler(self.callback_close, pattern=r'^close'))
-        application.add_handler(CallbackQueryHandler(self.callback_choose_promo, pattern=r'^promo>'))
-        application.add_handler(CallbackQueryHandler(self.callback_choose_count, pattern=r'^generate_count>'))
-        application.add_handler(CallbackQueryHandler(self.callback_back_to_games, pattern=r'^back_to_games'))
+        application.add_handler(MessageHandler(filters.ALL, self.handle_message))
 
         # error handlers
         application.add_error_handler(error_handler)
