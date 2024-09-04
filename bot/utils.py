@@ -3,6 +3,7 @@ import json
 import logging
 import os
 import random
+import requests 
 
 from telegram import Message, MessageEntity, Update
 from telegram.ext import ContextTypes
@@ -26,8 +27,10 @@ def localized_text(key, bot_language):
 
 
 def get_games_data():
-    with open(f'{data_path}/playground_games_data.json', 'r', encoding='utf-8') as f:
-        return json.loads(f.read())
+    games_data = requests.get("https://raw.githubusercontent.com/OxFF00FF/Hamster_Mayhem/master/Src/data/playground_games_data.json")
+    return games_data.json()
+    # with open(f'{data_path}/playground_games_data.json', 'r', encoding='utf-8') as f:
+    #    return json.loads(f.read())
 
 
 def _loading_gif():
