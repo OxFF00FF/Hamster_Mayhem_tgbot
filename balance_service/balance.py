@@ -1,6 +1,7 @@
 import datetime
 import os
 import time
+import traceback
 
 import requests
 from dotenv import load_dotenv
@@ -30,37 +31,42 @@ def get_headers(hamster_token: str) -> dict:
 
 
 def send_balance_to_group():
-    update_time_sec = 7200
-    chat_id = int(os.getenv('CHAT_ID'))
-    bot_token = os.getenv('TELEGRAM_BOT_TOKEN')
-    hamster_token = os.getenv('HAMSTER_TOKEN')
+    try:
+        update_time_sec = 7200
+        chat_id = int(os.getenv('CHAT_ID'))
+        bot_token = os.getenv('TELEGRAM_BOT_TOKEN')
+        hamster_token = os.getenv('HAMSTER_TOKEN')
 
-    while True:
-        response = requests.post('https://api.hamsterkombatgame.io/clicker/sync', headers=get_headers(hamster_token))
-        response.raise_for_status()
-
-        clicker = response.json()['clickerUser']
-        balance = int(clicker.get('balanceCoins', 'n/a'))
-        total = int(clicker['totalCoins'])
-        date = int(clicker['lastSyncUpdate'])
-        user_id = int(clicker['id'])
-
-        update_date = datetime.datetime.fromtimestamp(date).strftime('%Y-%m-%d %H:%M:%S')
-        result = f"💰  Баланс: {balance:,} \n" \
-                 f"⭐️  Всего: {total:,} \n" \
-                 f"🆔  ID пользователя: {user_id} \n" \
-                 f"🔄  Обновление: {update_date}"
-        text = result.replace(',', ' ')
-
-        if chat_id is not None:
-            response = requests.post(f"https://api.telegram.org/bot{bot_token}/sendMessage", data={"chat_id": chat_id, "text": text})
-            response.raise_for_status()
-        else:
-            response = requests.post(f"https://api.telegram.org/bot{bot_token}/sendMessage", data={"chat_id": chat_id, "text": balance})
+        while True:
+            response = requests.post('https://api.hamsterkombatgame.io/clicker/sync', headers=get_headers(hamster_token))
             response.raise_for_status()
 
-        print(f"✅  {update_date} · Баланс успешно отправлен в группу")
-        time.sleep(update_time_sec)
+            clicker = response.json()['clickerUser']
+            balance = int(clicker.get('balanceCoins', 'n/a'))
+            total = int(clicker['totalCoins'])
+            date = int(clicker['lastSyncUpdate'])
+            user_id = int(clicker['id'])
+
+            update_date = datetime.datetime.fromtimestamp(date).strftime('%Y-%m-%d %H:%M:%S')
+            result = f"💰  Баланс: {balance:,} \n" \
+                     f"⭐️  Всего: {total:,} \n" \
+                     f"🆔  ID пользователя: {user_id} \n" \
+                     f"🔄  Обновление: {update_date}"
+            text = result.replace(',', ' ')
+
+            if chat_id is not None:
+                response = requests.post(f"https://api.telegram.org/bot{bot_token}/sendMessage", data={"chat_id": chat_id, "text": text})
+                response.raise_for_status()
+            else:
+                response = requests.post(f"https://api.telegram.org/bot{bot_token}/sendMessage", data={"chat_id": chat_id, "text": balance})
+                response.raise_for_status()
+
+            print(f"✅  {update_date} · Баланс успешно отправлен в группу")
+            time.sleep(update_time_sec)
+
+    except Exception as e:
+        print(e)
+        print(traceback.format_exc())
 
 
 if __name__ == '__main__':
