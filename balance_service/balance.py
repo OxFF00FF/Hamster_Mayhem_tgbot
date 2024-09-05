@@ -37,6 +37,8 @@ def send_balance_to_group():
         bot_token = os.getenv('TELEGRAM_BOT_TOKEN')
         hamster_token = os.getenv('HAMSTER_TOKEN')
 
+        print(hamster_token)
+
         while True:
             response = requests.post('https://api.hamsterkombatgame.io/clicker/sync', headers=get_headers(hamster_token))
             response.raise_for_status()
