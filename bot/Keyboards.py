@@ -74,7 +74,7 @@ def apply_promocode_InlineKeyboard() -> InlineKeyboardMarkup:
 
 def promocodes_InlineKeyboard() -> InlineKeyboardMarkup:
     keyboard = []
-    games_data = get_games_data()['apps']
+    games_data = [app for app in get_games_data()['apps'] if app.get('available')]
 
     row = []
     for i, promo in enumerate(games_data):

@@ -632,9 +632,9 @@ class HamsterKombatClicker:
         :param apply_promo: применять ли полученные промокоды в аккаунте хомяка (необязательно)
         """
 
-        games_data = get_games_data()
+        games_data = [app for app in get_games_data()['apps'] if app.get('available')]
 
-        for promo in games_data['apps']:
+        for promo in games_data:
             if promo['prefix'] == prefix:
                 APP_TOKEN = promo['appToken']
                 PROMO_ID = promo['promoId']

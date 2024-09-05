@@ -53,7 +53,6 @@ class HamsterPromocodeGeneratorTelegramBot:
         ]
         self.group_commands = [BotCommand(command='chat', description="chat_description")] + self.commands
 
-        # self.games_data = get_games_data()['apps']
         self.games_data = [app for app in get_games_data()['apps'] if app.get('available')]
 
     async def get_promocodes(self, update, context):
