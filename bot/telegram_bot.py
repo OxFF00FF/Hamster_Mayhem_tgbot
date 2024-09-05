@@ -34,9 +34,8 @@ async def restart(__, _):
     logging.info('Restarting bot...')
     subprocess.Popen([sys.executable, sys.argv[0]])
     os.kill(os.getpid(), 9)
-
-
 # --------------------------------------------------- #
+
 
 HAMSTER_TOKEN = os.getenv('HAMSTER_TOKEN_1')
 hamster_client = HamsterKombatClicker(HAMSTER_TOKEN)
