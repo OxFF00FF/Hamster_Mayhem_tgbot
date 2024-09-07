@@ -1,7 +1,7 @@
 import datetime
+import logging
 import os
 import time
-import traceback
 
 import requests
 from dotenv import load_dotenv
@@ -31,12 +31,12 @@ def get_headers(hamster_token: str) -> dict:
 
 
 def send_balance_to_group():
-    try:
-        update_time_sec = 7200
-        chat_id = int(os.getenv('CHAT_ID'))
-        bot_token = os.getenv('TELEGRAM_BOT_TOKEN')
-        hamster_token = os.getenv('HAMSTER_TOKEN')
+    update_time_sec = 7200
+    chat_id = int(os.getenv('CHAT_ID'))
+    bot_token = str(os.getenv('TELEGRAM_BOT_TOKEN'))
+    hamster_token = str(os.getenv('HAMSTER_TOKEN'))
 
+    try:
         while True:
             response = requests.post('https://api.hamsterkombatgame.io/clicker/sync', headers=get_headers(hamster_token))
             response.raise_for_status()
@@ -54,19 +54,15 @@ def send_balance_to_group():
                      f"🔄  Обновление: {update_date}"
             text = result.replace(',', ' ')
 
-            if chat_id is not None:
+            if chat_id:
                 response = requests.post(f"https://api.telegram.org/bot{bot_token}/sendMessage", data={"chat_id": chat_id, "text": text})
                 response.raise_for_status()
-            else:
-                response = requests.post(f"https://api.telegram.org/bot{bot_token}/sendMessage", data={"chat_id": chat_id, "text": balance})
-                response.raise_for_status()
 
-            print(f"✅  {update_date} · Баланс успешно отправлен в группу")
-            time.sleep(update_time_sec)
+                print(f"✅  {update_date} · Баланс успешно отправлен")
+                time.sleep(update_time_sec)
 
     except Exception as e:
-        print(e)
-        print(traceback.format_exc())
+        logging.error(f"🚫  Не удалось отправить баланс: {e}")
 
 
 if __name__ == '__main__':
