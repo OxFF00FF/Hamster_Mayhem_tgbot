@@ -4,10 +4,9 @@
 
 version: '3'
 services:
-  hamster_mayhem-bot:
+  hamster_mayhem_telegram-bot:
     build: .
-    image: python:3.9-alpine
-    container_name: Hamster_Mayhem_tgbot
+    container_name: Hamster_Mayhem_tg-bot
     volumes:
       - ./bot:/app/bot
     restart: unless-stopped
