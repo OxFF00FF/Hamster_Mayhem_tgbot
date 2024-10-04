@@ -1,0 +1,10 @@
+{
+    "ru": {
+        "start_description": "Приветственное сообщение",
+        "help_description": "Получить справку",
+        "start_text": "\uD83D\uDC4B  Привет {0} \n\n\uD83D\uDCD1  Список доступных команд: /help",
+        "welcome_text": "\uD83E\uDD1D  Добро пожаловать {0} \n\n\uD83D\uDCD1  Список доступных команд: /help",
+        "help_text": "⚙️  Доступные команды: \n\n",
+        "disallow_message": "\uD83D\uDEAB  Извините, вам не разрешено использовать этого бота"
+    }
+}

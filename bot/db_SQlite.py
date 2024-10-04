@@ -8,10 +8,10 @@ import logging
 
 class BotDB:
     def __init__(self):
-        if not os.path.exists('db'):
-            os.makedirs('db')
+        if not os.path.exists('../db'):
+            os.makedirs('../db')
 
-        self.con = sqlite3.connect('db/BotDB.db')
+        self.con = sqlite3.connect('../db/BotDB.db')
         self.cur = self.con.cursor()
 
         self.cur.execute('''CREATE TABLE IF NOT EXISTS messages (
@@ -28,52 +28,6 @@ class BotDB:
                            `tg_user_id` INTEGER,
                            `is_subscriber` INTEGER,
                            `gpt_provider` VARCHAR(20))''')
-
-        self.cur.execute('''CREATE TABLE IF NOT EXISTS youtubeUrls (
-                           `id` INTEGER PRIMARY KEY AUTOINCREMENT,
-                           `url` TEXT UNIQUE,
-                           `short_info` TEXT,
-                           `video_info` TEXT,
-                           `thumbnail` TEXT,
-                           `title` TEXT)''')
-
-        self.cur.execute('''CREATE TABLE IF NOT EXISTS vkUrls (
-                           `id` INTEGER PRIMARY KEY AUTOINCREMENT,
-                           `url` TEXT UNIQUE,
-                           `short_info` TEXT,
-                           `video_info` TEXT,
-                           `thumbnail` TEXT,
-                           `title` TEXT)''')
-
-        self.cur.execute('''CREATE TABLE IF NOT EXISTS vk_formats (
-                           `id` INTEGER PRIMARY KEY AUTOINCREMENT,
-                           `fast` INTEGER,
-                           `button_text` TEXT,
-                           `emoji` VARCHAR(5),
-                           `frame_size` VARCHAR(10),
-                           `filesize` VARCHAR(10),
-                           `format_code` VARCHAR(20),
-                           `format_note` VARCHAR(20),
-                           `ext` VARCHAR(5),
-                           `tg_file_id` VARCHAR(100),
-                           `url` VARCHAR(100),
-                           `FK__vkUrls_id` INTEGER,
-                           FOREIGN KEY (FK__vkUrls_id) REFERENCES vkUrls(id))''')
-
-        self.cur.execute('''CREATE TABLE IF NOT EXISTS youtube_formats (
-                           `id` INTEGER PRIMARY KEY AUTOINCREMENT,
-                           `fast` INTEGER,
-                           `button_text` TEXT,
-                           `emoji` VARCHAR(5),
-                           `frame_size` VARCHAR(10),
-                           `filesize` VARCHAR(10),
-                           `format_code` VARCHAR(20),
-                           `format_note` VARCHAR(20),
-                           `ext` VARCHAR(5),
-                           `tg_file_id` VARCHAR(100),
-                           `url` VARCHAR(100),
-                           `FK__youtubeUrls_id` INTEGER,
-                           FOREIGN KEY (FK__youtubeUrls_id) REFERENCES youtubeUrls(id))''')
 
         self.con.commit()
 

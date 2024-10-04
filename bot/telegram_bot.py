@@ -14,11 +14,11 @@ from typing import Any
 
 import aiohttp
 import requests
-from telegram import BotCommand, BotCommandScopeAllGroupChats, Update, constants, InputMediaAnimation, InputMediaPhoto
+from telegram import BotCommand, Update, constants, InputMediaAnimation, InputMediaPhoto, BotCommandScopeDefault
 from telegram.ext import filters, ApplicationBuilder, CommandHandler, MessageHandler, CallbackQueryHandler, Application
 
 import Keyboards as kb
-from utils import _error_gif, _hamster_key, _game_image, _loading_gif, _combo_image, remain_time, text_to_morse
+from utils import _error_gif, _hamster_key, _game_image, _loading_gif, _combo_image, remain_time, text_to_morse, localized_text
 from utils import get_thread_id, error_handler, get_games_data
 from Hamster import HamsterKombatClicker
 from db_SQlite import BotDB
@@ -42,13 +42,15 @@ hamster_client = HamsterKombatClicker(HAMSTER_TOKEN)
 class HamsterPromocodeGeneratorTelegramBot:
     def __init__(self, config: dict):
         self.config = config
+
+        self.lang = self.config['bot_language']
+
         self.commands = [
+            BotCommand(command='start', description="Приветственное сообщение"),
+            BotCommand(command='help', description="Справочное сообщение"),
             BotCommand(command='promocodes', description="Получить промокоды"),
             BotCommand(command='daily_info', description="Информация о комбо и шифре сегодня"),
-            BotCommand(command='help', description="Показать справочное сообщение"),
-            BotCommand(command='info', description="Информация о проекте"),
         ]
-        self.group_commands = [BotCommand(command='chat', description="chat_description")] + self.commands
 
         self.games_data = [app for app in get_games_data()['apps'] if app.get('available')]
 
@@ -143,9 +145,9 @@ class HamsterPromocodeGeneratorTelegramBot:
                 async with progress_lock:
                     total_progress += progress_increment
                     overall_progress = (total_progress / (keys_count * EVENTS_COUNT)) * 100
-                    text = f"💠  Прогресс: {overall_progress:.0f}%"
+                    text = f"💠  <b>Прогресс: {overall_progress:.0f}%</b>"
 
-                    await context.bot.edit_message_text(chat_id=user_id, message_id=loading_message.message_id, text=text)
+                    await context.bot.edit_message_text(chat_id=user_id, message_id=loading_message.message_id, text=text, parse_mode=constants.ParseMode.HTML)
                     logging.info(f"{keys_count} {prefix} · {overall_progress:.0f}% · User: {user_id}")
 
                 if has_code:
@@ -224,29 +226,23 @@ class HamsterPromocodeGeneratorTelegramBot:
         await context.bot.send_message(chat_id=self.config['chat_id'], text=f"📩  New message: <b>`{update.message.text}`</b>\n\n🙍‍♂️  From user: <b>`{update.message.from_user.name}`</b>", parse_mode=constants.ParseMode.HTML)
 
         user_name = update.message.from_user.first_name
-        welcome_message = f"🤝  Добро пожаловать <b>{user_name}</b>\n"
-        hello_message = f"✋  Привет <b>{user_name}</b>\n"
         keyboard = kb.close_InlineKeyboard
         if not db.user_exist(update.effective_message.from_user.id):
             db.ADD_subscriber(update)
             await context.bot.send_message(chat_id=self.config['chat_id'], text=f"🌟  New Subscriber: <b>`{user_name}`</b>\n🆔  ID: {update.message.from_user.id}", parse_mode=constants.ParseMode.HTML)
-            await update.message.reply_text(welcome_message, reply_markup=keyboard, parse_mode=constants.ParseMode.HTML)
+            await update.message.reply_text(text=localized_text('wellcome_text', user_name), reply_markup=keyboard, parse_mode=constants.ParseMode.HTML)
         else:
-            await update.message.reply_text(text=hello_message, reply_markup=keyboard, parse_mode=constants.ParseMode.HTML)
+            await update.message.reply_text(text=localized_text('start_text', user_name), reply_markup=keyboard, parse_mode=constants.ParseMode.HTML)
 
     async def help(self, update: Update, context) -> None:
         db.ADD_user_message(update)
+
+        commands_description = [f'/{command.command} - <b>{command.description}</b>' for command in self.commands]
+        help_text = localized_text('help_text')
+        help_text += '\n'.join(commands_description)
+        await update.message.reply_text(help_text, parse_mode=constants.ParseMode.HTML)
+
         await context.bot.send_message(chat_id=self.config['chat_id'], text=f"📩  New message: `{update.message.text}`\n🙍‍♂️  From user: {update.message.from_user.name}")
-
-        help_text = f"help text"
-        await update.message.reply_text(help_text, disable_web_page_preview=True, parse_mode=constants.ParseMode.MARKDOWN)
-
-    async def info(self, update: Update, context) -> None:
-        db.ADD_user_message(update)
-        await context.bot.send_message(chat_id=self.config['chat_id'], text=f"📩  New message: `{update.message.text}`\n\n🙍‍♂️  From user: {update.message.from_user.name}")
-
-        info_text = f"info text"
-        await update.message.reply_text(info_text, disable_web_page_preview=True, parse_mode=constants.ParseMode.MARKDOWN)
 
     async def daily_info(self, update: Update, context):
         db.ADD_user_message(update)
@@ -351,8 +347,7 @@ class HamsterPromocodeGeneratorTelegramBot:
         """
         Post initialization hook for the bot.
         """
-        await application.bot.set_my_commands(self.group_commands, scope=BotCommandScopeAllGroupChats())
-        await application.bot.set_my_commands(self.commands)
+        await application.bot.set_my_commands(self.commands, scope=BotCommandScopeDefault(), language_code=self.config['bot_language'])
 
     def run(self):
         """
@@ -369,7 +364,6 @@ class HamsterPromocodeGeneratorTelegramBot:
         # command handlers
         application.add_handler(CommandHandler('start', self.start))
         application.add_handler(CommandHandler('help', self.help))
-        application.add_handler(CommandHandler('info', self.info))
         application.add_handler(CommandHandler('restart', restart))
 
         application.add_handler(CommandHandler('daily_info', self.daily_info))

@@ -5,29 +5,49 @@ import os
 import random
 
 import requests
+from dotenv import load_dotenv
 from telegram import Message, MessageEntity, Update
 from telegram.ext import ContextTypes
+
+from colors import *
+load_dotenv()
+
 
 data_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'bot', 'data')
 
 
-def localized_text(key, bot_language):
-    with open(f"{data_path}/translations.json", 'r', encoding='utf-8') as f:
-        translations = json.load(f)
+def localized_text(key, *args, **kwargs):
+    """
+    Return translated text for a key in specified bot_language.
+    Keys and translations can be found in the translations.json.
+    """
+    bot_language = os.getenv('BOT_LANGUAGE')
 
     try:
-        return translations[bot_language][key]
-    except KeyError:
-        logging.warning(f"No translation available for bot_language code '{bot_language}' and key '{key}'")
-        if key in translations['ru']:
-            return translations['ru'][key]
-        else:
-            logging.warning(f"No english definition found for key '{key}' in translations.json")
+        with open('data/translations.json', 'r', encoding='utf-8') as f:
+            translations = json.load(f)
+    except json.JSONDecodeError:
+        logging.error(f"Failed to decode file `translations.json`")
+        exit(1)
+
+    message = translations.get(bot_language, {}).get(key)
+
+    if message is None:
+        logging.warning(f"No translation for language code {LIGHT_CYAN}`{bot_language}`{WHITE} and key {LIGHT_MAGENTA}`{key}`{WHITE}")
+
+        message = translations.get('en', {}).get(key)
+        if message is None:
+            logging.warning(f"No English for key {LIGHT_MAGENTA}`{key}`{WHITE} in translations.json")
             return key
+
+    try:
+        return message.format(**kwargs)
+    except:
+        return message.format(*args)
 
 
 def get_games_data():
-    response = requests.get('https://raw.githubusercontent.com/OxFF00FF/Hamster_Mayhem/master/Src/data/playground_games_data.json')
+    response = requests.get('https://raw.githubusercontent.com/OxFF00FF/Hamster_Mayhem/refs/heads/master/data/playground_games_data.json')
     response.raise_for_status()
     return response.json()
 
