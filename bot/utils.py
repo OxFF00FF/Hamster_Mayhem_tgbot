@@ -21,19 +21,17 @@ def localized_text(key, *args, **kwargs):
     Return translated text for a key in specified bot_language.
     Keys and translations can be found in the translations.json.
     """
-    bot_language = os.getenv('BOT_LANGUAGE')
+    # Load translations
+    parent_dir_path = os.path.join(os.path.dirname(__file__), 'data')
+    translations_file_path = os.path.join(parent_dir_path, 'translations.json')
+    with open(translations_file_path, 'r', encoding='utf-8') as f:
+        translations = json.load(f)
 
-    try:
-        with open('data/translations.json', 'r', encoding='utf-8') as f:
-            translations = json.load(f)
-    except json.JSONDecodeError:
-        logging.error(f"Failed to decode file `translations.json`")
-        exit(1)
+    lang = os.getenv('BOT_LANGUAGE')
 
-    message = translations.get(bot_language, {}).get(key)
-
+    message = translations.get(lang, {}).get(key)
     if message is None:
-        logging.warning(f"No translation for language code {LIGHT_CYAN}`{bot_language}`{WHITE} and key {LIGHT_MAGENTA}`{key}`{WHITE}")
+        logging.warning(f"No translation for language code {LIGHT_CYAN}`{lang}`{WHITE} and key {LIGHT_MAGENTA}`{key}`{WHITE}")
 
         message = translations.get('en', {}).get(key)
         if message is None:
