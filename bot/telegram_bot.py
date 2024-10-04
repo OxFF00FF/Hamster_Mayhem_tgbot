@@ -49,7 +49,7 @@ class HamsterPromocodeGeneratorTelegramBot:
             BotCommand(command='start', description="Приветственное сообщение"),
             BotCommand(command='help', description="Справочное сообщение"),
             BotCommand(command='promocodes', description="Получить промокоды"),
-            BotCommand(command='daily_info', description="Информация о комбо и шифре сегодня"),
+            # BotCommand(command='daily_info', description="Информация о комбо и шифре сегодня"),
         ]
 
         self.games_data = [app for app in get_games_data()['apps'] if app.get('available')]
@@ -347,7 +347,11 @@ class HamsterPromocodeGeneratorTelegramBot:
         """
         Post initialization hook for the bot.
         """
-        await application.bot.set_my_commands(self.commands, scope=BotCommandScopeDefault(), language_code=self.config['bot_language'])
+        Bot = application.bot
+        logging.info(f"🤖  Bot started as {Bot.first_name.capitalize()} · https://t.me/{Bot.username}")
+        await Bot.set_my_commands(self.commands, scope=BotCommandScopeDefault(), language_code=self.config['bot_language'])
+        logging.info(f"🚀  Application is running. Press CTRL+C to stop")
+
 
     def run(self):
         """
